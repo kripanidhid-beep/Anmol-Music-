@@ -1,4 +1,3 @@
-pyrogram==2.0.106
-PyTgCalls==0.9.15
+pyrogram
+pytgcalls
 yt-dlp
-ffmpeg-python
