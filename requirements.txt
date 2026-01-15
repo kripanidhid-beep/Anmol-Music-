@@ -1,3 +1,4 @@
 pyrogram
 pytgcalls
 yt-dlp
+ffmpeg-python
