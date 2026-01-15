@@ -5,47 +5,33 @@ from pytgcalls.types import AudioPiped
 from yt_dlp import YoutubeDL
 from config import API_ID, API_HASH, BOT_TOKEN, SESSION_NAME
 
-# Bot aur Assistant Setup
+# Setup
 bot = Client("MusicBot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 assistant = Client("Assistant", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_NAME)
 call_py = PyTgCalls(assistant)
 
-def get_audio_url(query):
-    ydl_opts = {"format": "bestaudio/best", "quiet": True, "no_warnings": True}
-    with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(f"ytsearch:{query}", download=False)["entries"][0]
-        return info["url"], info["title"]
-
 @bot.on_message(filters.command("play") & filters.group)
-async def play_music(client, message):
+async def play_music(_, message):
     if len(message.command) < 2:
-        return await message.reply_text("🔎 Gaane ka naam likho!")
-    
+        return await message.reply("🔎 Gaane ka naam likho!")
     query = " ".join(message.command[1:])
-    m = await message.reply_text("🔄 **Searching...**")
+    m = await message.reply("🔄 Searching...")
     try:
-        audio_url, title = get_audio_url(query)
-        await call_py.play(message.chat.id, AudioPiped(audio_url))
-        await m.edit(f"▶️ **Playing:** `{title}`")
+        with YoutubeDL({"format": "bestaudio", "quiet": True}) as ydl:
+            info = ydl.extract_info(f"ytsearch:{query}", download=False)["entries"][0]
+            url = info["url"]
+            title = info["title"]
+        await call_py.play(message.chat.id, AudioPiped(url))
+        await m.edit(f"▶️ **Playing:** {title}")
     except Exception as e:
-        await m.edit(f"❌ **Error:** {e}")
+        await m.edit(f"❌ Error: {e}")
 
-@bot.on_message(filters.command("stop") & filters.group)
-async def stop_music(client, message):
-    try:
-        await call_py.leave_call(message.chat.id)
-        await message.reply_text("⏹️ **Stopped.**")
-    except:
-        await message.reply_text("❌ Nothing is playing.")
-
-async def start_bot():
-    print("✅ Starting Bot...")
+async def start():
     await bot.start()
     await call_py.start()
-    print("🚀 Bot Online!")
+    print("🚀 BOT IS LIVE!")
     await asyncio.Idle()
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(start_bot())
+    asyncio.get_event_loop().run_until_complete(start())
     
