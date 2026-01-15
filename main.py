@@ -5,13 +5,13 @@ from pytgcalls.types import AudioPiped
 from yt_dlp import YoutubeDL
 from config import API_ID, API_HASH, BOT_TOKEN, SESSION_NAME
 
-# Clients Setup
+# Bot aur Assistant Setup
 bot = Client("MusicBot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 assistant = Client("Assistant", api_id=API_ID, api_hash=API_HASH, session_string=SESSION_NAME)
 call_py = PyTgCalls(assistant)
 
 def get_audio_url(query):
-    ydl_opts = {"format": "bestaudio/best", "quiet": True}
+    ydl_opts = {"format": "bestaudio/best", "quiet": True, "no_warnings": True}
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(f"ytsearch:{query}", download=False)["entries"][0]
         return info["url"], info["title"]
